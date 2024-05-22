@@ -393,8 +393,12 @@
     console.log(country_codes);
     // console.log(typeof ("<%= countries %>"));
     country_codes.forEach(code => {
-      document.getElementById(code).style.fill = "<%= color %>";
-
+      let element = document.getElementById(code);
+    if (element) {
+      element.style.fill = "Aquamarine";
+    } else {
+      console.log('Element not found for country code: ' + code);
+    }
     });
     
   </script>
