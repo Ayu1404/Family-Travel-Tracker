@@ -388,19 +388,23 @@
   <h2 class="total-count">Total Countries: <%=total%>
   </h2>
   <script>
-  
-    const country_codes = "<%= countries %>".split(",")
-    console.log(country_codes);
-    // console.log(typeof ("<%= countries %>"));
-    country_codes.forEach(code => {
-      let element = document.getElementById(code);
-    if (element) {
-      element.style.fill = "Aquamarine";
-    } else {
-      console.log('Element not found for country code: ' + code);
+    function colorCountries() {
+      const country_codes = "<%= countries %>".split(",");
+      console.log(typeof ("<%= countries %>"));
+      const color = "<%= color %>";
+
+      country_codes.forEach(code => {
+        let element = document.getElementById(code);
+        if (element) {
+          element.style.fill = color;
+        } else {
+          console.log('Element not found for country code: ' + code);
+        }
+      });
     }
-    });
-    
+  
+    // Call the function to color countries on page load
+    document.addEventListener('DOMContentLoaded', colorCountries);
   </script>
 </body>
 
