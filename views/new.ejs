@@ -13,7 +13,7 @@
   <h1>Add a Family Member</h1>
   <form action="/new" method="post">
     <p>What's your name?</p>
-    <input type="text" name="name">
+    <input type="text" name="name" required>
 
     <p>Pick a color:</p>
     <input type="radio" name="color" id="red" value="red" />
@@ -31,8 +31,8 @@
     <input type="radio" name="color" id="orange" value="orange" />
     <label for="orange"><span class="orange"></span></label>
 
-    <input type="radio" name="color" id="teal" value="indigo" />
-    <label for="teal"><span class="teal"></span></label>
+    <input type="radio" name="color" id="indigo" value="indigo" />
+    <label for="indigo"><span class="teal"></span></label>
 
     <input type="radio" name="color" id="blue" value="blue" />
     <label for="blue"><span class="blue"></span></label>
@@ -45,6 +45,7 @@
 
     <input type="radio" name="color" id="pink" value="pink" />
     <label for="pink"><span class="pink"></span></label>
+
     <div class="spacer"></div>
     <button type="submit">Add</button>
   </form>

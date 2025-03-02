@@ -28,10 +28,10 @@ let users = [
   { id: 2, name: "Anamika", color: "powderblue" },
 ];
 
-async function checkVisisted() {
+async function checkVisited() {
   const result = await db.query(
-    "SELECT country_code FROM visited_countries JOIN users ON users.id = user_id WHERE user_id = $1; ",
-  [currentUserId]
+    "SELECT country_code FROM visited_countries WHERE user_id = $1;",
+    [currentUserId]
   );
   let countries = [];
   result.rows.forEach((country) => {
@@ -47,7 +47,7 @@ async function getCurrentUser() {
 }
 
 app.get("/", async (req, res) => {
-  const countries = await checkVisisted();
+  const countries = await checkVisited();
   const currentUser = await getCurrentUser();
   res.render("index.ejs", {
     countries: countries,
@@ -66,37 +66,54 @@ app.post("/add", async (req, res) => {
       [input.toLowerCase()]
     );
 
-    const data = result.rows[0];
-    const countryCode = data.country_code;
-    try {
-      await db.query(
-        "INSERT INTO visited_countries (country_code, user_id) VALUES ($1, $2)",
-        [countryCode, currentUserId]
-      );
-      res.redirect("/");
-    } catch (err) {
-      console.log(err);
-      const countries = await checkVisisted();
-      res.render("index.ejs", {
+    if (result.rowCount === 0) {
+      const countries = await checkVisited();
+      return res.render("index.ejs", {
         countries: countries,
-        total : countries.length,
+        total: countries.length,
         users: users,
         color: currentUser.color,
-        error: "Country has already been added, try again.",
+        error: "Country name does not exist, try again.",
       });
     }
+
+    const data = result.rows[0];
+    const countryCode = data.country_code;
+    
+    const duplicateCheck = await db.query(
+      "SELECT * FROM visited_countries WHERE country_code = $1 AND user_id = $2;",
+      [countryCode, currentUserId]
+    );
+
+    if (duplicateCheck.rowCount > 0) {
+      const countries = await checkVisited();
+      return res.render("index.ejs", {
+        countries: countries,
+        total: countries.length,
+        users: users,
+        color: currentUser.color,
+        error: "Country has already been added for this user, try again.",
+      });
+    }
+
+    await db.query(
+      "INSERT INTO visited_countries (country_code, user_id) VALUES ($1, $2)",
+      [countryCode, currentUserId]
+    );
+    res.redirect("/");
   } catch(err) {
     console.log(err);
-    const countries = await checkVisisted();
+    const countries = await checkVisited();
     res.render("index.ejs", {
       countries: countries,
-      total : countries.length,
+      total: countries.length,
       users: users,
       color: currentUser.color,
-      error: "Country name does not exist, try again.",
+      error: "Error adding the country, try again.",
     });
   }
 });
+
 
 app.post("/user", async (req, res) => {
   if (req.body.add === "new") {
@@ -113,8 +130,8 @@ app.post("/new", async (req, res) => {
 
   const result = await db.query(
     "INSERT INTO users (name, color) VALUES($1, $2) RETURNING *;",
-    [name, color] 
-    );
+    [name, color]
+  );
 
   const id = result.rows[0].id;
   currentUserId = id;
@@ -125,4 +142,3 @@ app.post("/new", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
-

@@ -389,10 +389,10 @@
   </h2>
   <script>
     function colorCountries() {
-      const country_codes = "<%= countries %>".split(",");
-      console.log(typeof ("<%= countries %>"));
+      const country_codes = "<%= countries.join(',') %>".split(",");
+      console.log(typeof ("<%= countries.join(',') %>"));
       const color = "<%= color %>";
-
+  
       country_codes.forEach(code => {
         let element = document.getElementById(code);
         if (element) {
@@ -406,6 +406,7 @@
     // Call the function to color countries on page load
     document.addEventListener('DOMContentLoaded', colorCountries);
   </script>
+  
 </body>
 
 </html>
